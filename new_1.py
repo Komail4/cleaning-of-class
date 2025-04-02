@@ -2,6 +2,7 @@ import tkinter
 import json
 import datetime
 from tkinter import ttk
+from tkinter import messagebox
 
 x = datetime.datetime.now()
 
@@ -61,15 +62,17 @@ label_swags.pack(pady=5)
 combo_swags = ttk.Combobox(input_info, values=status, state="readonly")
 combo_swags.pack(pady=5)
 
-result_label = tkinter.Label(input_info, text="سلام")
-result_label.pack(pady=10)
-
 def submit(*status):
     if "" in status:
-        result_label.config(text="لطفا همه فیلدها را پر کنید")
+        messagebox.showwarning("Warning", "لطفا همه فیلدها را پر کنید")
         return
-    with open(file_path, "r") as file:
-        data = json.load(file)
+    
+    try:
+        with open(file_path, "r") as file:
+            data = json.load(file)
+
+    except FileNotFoundError:
+        messagebox.showwarning("Warning", "فایل اطلاعات پیدا نشد")
 
     calculated_status = (int(status[1]) + int(status[2]) + int(status[3]) + int(status[4]) + int(status[5]) + int(status[6])) / 6
 
@@ -77,9 +80,8 @@ def submit(*status):
 
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
-    result_label.config(text=f"Class {status[0]} - Status: {calculated_status}%\nWindow: {status[1]}\nWaste Basket: {status[2]}\nChairs/Desks: {status[3]}\nClass Status: {status[4]}\nLamps: {status[5]}\nSwags: {status[6]}")
-
     
+    messagebox.showinfo("Success", f"'اطلاعات با موفقیت ذخیره شد'\nDate: {x.strftime("%Y-%m-%d")}\nClass {status[0]} - Status: {calculated_status}%\nWindow: {status[1]}\nWaste Basket: {status[2]}\nChairs/Desks: {status[3]}\nClass Status: {status[4]}\nLamps: {status[5]}\nSwags: {status[6]}")
 
 button_submit = tkinter.Button(input_info, text="ثبت", command=lambda: submit(
     combo_class.get(),
@@ -95,7 +97,7 @@ button_submit.pack(pady=10)
 menu_bar = tkinter.Menu(top)
 
 main_menu = tkinter.Menu(menu_bar, tearoff=0)
-main_menu.add_command(label="Main Menu", command=lambda: show_frame(output_frame))
+main_menu.add_command(label="Result", command=lambda: show_frame(output_frame))
 main_menu.add_separator()
 main_menu.add_command(label="Entering info", command=lambda: show_frame(input_info))
 menu_bar.add_cascade(label="Menu", menu=main_menu)
