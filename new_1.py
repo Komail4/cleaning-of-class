@@ -239,19 +239,98 @@ combo_class_monthly.pack(pady = 5)
 label_date_monthly = tkinter.Label(output_monthly, text = ":ماه")
 label_date_monthly.pack(pady=5)
 
+combo_year_monthly = ttk.Combobox(output_monthly, values=years, state="readonly")
+combo_year_monthly.set("1404")
+combo_year_monthly.pack(pady=5)
+
 months = [str(m) for m in range(1, 13)]
 combo_month_monthly = ttk.Combobox(output_monthly, values=months, state="readonly")
 combo_month_monthly.set("1")
 combo_month_monthly.pack(pady=5)
 
-def monthly_output(class_1, month):
+def monthly_output(class_1, year, month):
+    if not (year and month):
+        messagebox.showwarning("Warning", "لطفا سال و ماه را انتخاب کنید")
+        return
+    
+    try:
+        with open(file_path, "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        messagebox.showwarning("Warning", "فایل اطلاعات پیدا نشد")
+        return
+    
+    monthly_results = []
+    
+    for day in range(1, 32):  # Checking all possible days
+        try:
+            date = jdatetime.date(int(year), int(month), day)
+            date_str = date.strftime("%Y-%m-%d")
+
+            if class_1 in data and date_str in data[class_1]:
+                monthly_results.append(data[class_1][date_str]["result"])
+        except ValueError:
+            break  # Break when the month has fewer than 31 days
+
+    if not monthly_results:
+        messagebox.showinfo("Monthly Report", "هیچ اطلاعاتی برای این ماه موجود نیست")
+        return
+
+    monthly_average = sum(monthly_results) / len(monthly_results)
+    messagebox.showinfo("Monthly Report", f"Class {class_1} - Monthly Status: {monthly_average:.2f}%")
+
     pass
 
 
 
 button_submit_monthly = tkinter.Button(output_monthly, text="تایید", command=lambda: monthly_output(
     combo_class_monthly.get(),
+    combo_year_monthly.get(),
     combo_month_monthly.get()))
+button_submit_monthly.pack(pady=5)
+
+
+
+
+
+label_class_total = tkinter.Label(output_total, text=":صنف")
+label_class_total.pack(pady=5)
+
+combo_class_total = ttk.Combobox(output_total, values=class_numbers, state="readonly")
+combo_class_total.pack(pady=5)
+
+def total_output(class_1):
+    if not class_1:
+        messagebox.showwarning("Warning", "لطفا صنف را انتخاب کنید")
+        return
+    
+    try:
+        with open(file_path, "r") as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        messagebox.showwarning("Warning", "فایل اطلاعات پیدا نشد")
+        return
+    
+    if class_1 not in data or not data[class_1]:
+        messagebox.showinfo("Total Report", "هیچ اطلاعاتی برای این صنف موجود نیست")
+        return
+    
+    total_results = []
+    
+    for date_str in data[class_1]:
+        total_results.append(data[class_1][date_str]["result"])
+
+    if not total_results:
+        messagebox.showinfo("Total Report", "هیچ اطلاعاتی برای این صنف موجود نیست")
+        return
+
+    total_average = sum(total_results) / len(total_results)
+    messagebox.showinfo("Total Report", f"Class {class_1} - Total Status: {total_average:.2f}%")
+
+button_submit_total = tkinter.Button(output_total, text="تایید", command=lambda: total_output(
+    combo_class_total.get()))
+button_submit_total.pack(pady=5)
+
 
 
 
