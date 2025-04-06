@@ -148,6 +148,10 @@ def daily_output(class_1, selected_year, selected_month, selected_day):
         messagebox.showwarning("Warning", "فایل اطلاعات پیدا نشد")
         return
     
+    if date_str in data[class_1]:
+        messagebox.showwarning("Warning", "اطلاعات پیدا نشد")
+        return
+    
     output = data[class_1][date_str]["result"]
     messagebox.showinfo("Result", f"{date_str}\nClass{class_1} - Status: {output}")
 
@@ -198,6 +202,9 @@ combo_weeks.pack(pady=5)
 def weekly_output(class_1, selected_week):
     if not selected_week:
         messagebox.showwarning("Warning", "لطفا هفته مورد نظر را انتخاب کنید")
+        return
+    if not class_1:
+        messagebox.showwarning("Warning", "لطفا یک صنف را انتخاب کنید")
         return
 
     week_parts = selected_week.split()
