@@ -13,7 +13,7 @@ file_path = "info.json"
 
 top = tkinter.Tk()
 top.title("Class Status Manager")
-top.geometry("400x500")
+top.geometry("400x600")
 
 container = tkinter.Frame(top)
 container.pack(fill="both", expand=True)
@@ -34,6 +34,24 @@ label_class = tkinter.Label(input_info, text=":صنف")
 label_class.pack(pady=5)
 combo_class = ttk.Combobox(input_info, values=class_numbers, state="readonly")
 combo_class.pack(pady=5)
+
+label_date_entry = tkinter.Label(input_info, text = ":تاریخ")
+label_date_entry.pack(pady=5)
+
+years_1 = [str(y) for y in range(1400, 1410)]
+combo_year_entry = ttk.Combobox(input_info, values=years_1, state="readonly")
+combo_year_entry.set(x.strftime("%Y"))
+combo_year_entry.pack(pady=2)
+
+months_1 = [str(m) for m in range(1, 13)]
+combo_month_entry = ttk.Combobox(input_info, values=months_1, state="readonly")
+combo_month_entry.set(x.strftime("%m"))
+combo_month_entry.pack(pady=2)
+
+days_1 = [str(d) for d in range(1, 32)]
+combo_day_entry = ttk.Combobox(input_info, values=days_1, state="readonly")
+combo_day_entry.set(x.strftime("%d"))
+combo_day_entry.pack(pady=2)
 
 label_window = tkinter.Label(input_info, text=":وضعیت پنجره")
 label_window.pack(pady=5)
@@ -78,7 +96,7 @@ def submit(*status):
     
     calculated_status = (int(status[1]) + int(status[2]) + int(status[3]) + int(status[4]) + int(status[5]) + int(status[6])) / 6
     
-    date_str = x.strftime("%Y-%m-%d")
+    date_str = jdatetime.date(int(status[7]), int(status[8]), int(status[9])).strftime("%Y-%m-%d")
     
     if status[0] not in data:
         data[status[0]] = {}
@@ -105,7 +123,10 @@ button_submit = tkinter.Button(input_info, text="ثبت", command=lambda: submit
     combo_chairs_desks.get(),
     combo_class_status.get(),
     combo_lamps.get(),
-    combo_swags.get()
+    combo_swags.get(),
+    combo_year_entry.get(),
+    combo_month_entry.get(),
+    combo_day_entry.get()
 ))
 button_submit.pack(pady=10)
 
@@ -148,7 +169,7 @@ def daily_output(class_1, selected_year, selected_month, selected_day):
         messagebox.showwarning("Warning", "فایل اطلاعات پیدا نشد")
         return
     
-    if date_str in data[class_1]:
+    if date_str not in data[class_1]:
         messagebox.showwarning("Warning", "اطلاعات پیدا نشد")
         return
     
